@@ -1,7 +1,11 @@
 <template>
     <div class="container">
-        <header>
+        <header v-if="factType === 'math'">
             <h2>Get a math fact about</h2>
+            <h2>your favorite number!</h2>
+        </header>
+        <header v-else>
+            <h2>Get a piece of trivia about</h2>
             <h2>your favorite number!</h2>
         </header>
         <div class="input-container">
@@ -10,7 +14,8 @@
                 <transition name="error">
                     <span v-if="error" class="error">Please enter a number</span>
                 </transition>
-                <button type="submit">Get Fact!</button>
+                <button v-if="factType === 'math'" type="submit">Get Fact!</button>
+                <button v-else type="submit">Get Trivia!</button>
             </form>
         </div>
         <div class="message">
@@ -19,29 +24,26 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import { fetchMathFact } from './ajax'
 
-export default {
-    name: 'NumberMathFact',
-    data() {
-        return {
-            number: null,
-            numberFact: '',
-            error: false
+@Component({})
+export default class NumberMathFact extends Vue {
+    @Prop(String) readonly factType!: string
+    number: number | null = null
+    numberFact: string = ''
+    error: boolean = false
+
+    async fetchFact() {
+        if (!this.number) {
+            this.error = true
+            this.numberFact = ''
+            return
         }
-    },
-    methods: {
-        async fetchFact() {
-            if (!this.number) {
-                this.error = true
-                this.numberFact = ''
-                return
-            }
-            this.error = false
-            const response = await fetchMathFact(this.number)
-            this.numberFact = response.data
-        }
+        this.error = false
+        const response = await fetchMathFact(this.number, this.factType)
+        this.numberFact = response.data
     }
 }
 </script>

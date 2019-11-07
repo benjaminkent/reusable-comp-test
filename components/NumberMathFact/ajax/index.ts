@@ -6,6 +6,6 @@ const ajax = axios.create({
     baseURL: URL
 })
 
-export const fetchMathFact = (num) => {
-    return ajax.get(`/${num}/math`)
+export const fetchMathFact = (num: number, factType: string) => {
+    return ajax.get(`/${num}/${factType}`)
 }
